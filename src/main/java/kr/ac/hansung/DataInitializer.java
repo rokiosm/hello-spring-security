@@ -31,15 +31,22 @@ public class DataInitializer implements ApplicationRunner {
         Role adminRole = roleRepository.findByName("ROLE_ADMIN")
             .orElseGet(() -> roleRepository.save(new Role("ROLE_ADMIN")));
 
-        if (!userRepository.existsByEmail("admin@hansung.ac.kr")) {
-            User admin = new User();
-            admin.setEmail("admin@hansung.ac.kr");
-            admin.setPassword(passwordEncoder.encode("admin1234"));
+        User admin = userRepository.findByEmail("admin@hansung.ac.kr")
+            .orElseGet(User::new);
+
+        admin.setEmail("admin@hansung.ac.kr");
+        admin.setPassword(passwordEncoder.encode("admin1234"));
+
+        if (!admin.getRoles().contains(userRole)) {
             admin.getRoles().add(userRole);
-            admin.getRoles().add(adminRole);
-            userRepository.save(admin);
-            log.info("초기 관리자 계정 생성: admin@hansung.ac.kr / admin1234");
         }
+
+        if (!admin.getRoles().contains(adminRole)) {
+            admin.getRoles().add(adminRole);
+        }
+
+        userRepository.save(admin);
+        log.info("관리자 계정 초기화: admin@hansung.ac.kr / admin1234");
 
         if (productRepository.count() == 0) {
             productRepository.save(new Product("Spring Boot 4 완벽 가이드", 35000, "Spring Boot 4 + JPA + Security 실습서", 50));
