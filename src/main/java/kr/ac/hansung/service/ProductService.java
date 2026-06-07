@@ -4,10 +4,10 @@ import kr.ac.hansung.dto.ProductDto;
 import kr.ac.hansung.entity.Product;
 import kr.ac.hansung.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -24,9 +24,27 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    public Page<Product> findProducts(String keyword, Pageable pageable) {
+        return productRepository.searchProducts(keyword, pageable);
+    }
+
+    @Transactional(readOnly = true)
     public Product findById(Long id) {
         return productRepository.findById(id)
             .orElseThrow(() -> new NoSuchElementException("상품을 찾을 수 없습니다: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public ProductDto findDtoById(Long id) {
+        Product product = findById(id);
+
+        ProductDto dto = new ProductDto();
+        dto.setName(product.getName());
+        dto.setPrice(product.getPrice());
+        dto.setDescription(product.getDescription());
+        dto.setStock(product.getStock());
+
+        return dto;
     }
 
     @Transactional
@@ -38,12 +56,17 @@ public class ProductService {
     }
 
     @Transactional
+    public void updateProduct(Long id, ProductDto dto) {
+        Product product = findById(id);
+
+        product.setName(dto.getName());
+        product.setPrice(dto.getPrice());
+        product.setDescription(dto.getDescription());
+        product.setStock(dto.getStock());
+    }
+
+    @Transactional
     public void deleteById(Long id) {
         productRepository.deleteById(id);
     }
-}
-
-
-public Page<Product> findProducts(String keyword, Pageable pageable) {
-    return productRepository.searchProducts(keyword, pageable);
 }
