@@ -123,11 +123,3 @@ POST /login (email + password)
 | `/products/add`, `/products/*/delete` | ROLE_ADMIN |
 | `POST /products` | ROLE_ADMIN |
 | 그 외 모든 요청 | 로그인 사용자 |
-
-### 관리자 대시보드 통계
-
-`AdminController`에서 Repository를 직접 조회하여 아래 통계를 화면에 전달합니다.
-
-- 전체 회원 수
-- 전체 상품 수
-- 재고 없는 상품 수 (stock = 0)
