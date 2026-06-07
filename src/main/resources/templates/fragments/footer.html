@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<footer th:fragment="assignmentFooter"
+        class="assignment-footer"
+        th:attr="data-student-id=${studentId},data-student-name=${studentName}">
+    <span class="fw-semibold">실습 수행 일시:</span>
+    <span id="assignment-current-time">계산 중</span>
+    <span class="mx-2">|</span>
+    <span class="fw-semibold">학번:</span>
+    <span th:text="${studentId}">2020XXXXX</span>
+    <span class="mx-2">|</span>
+    <span class="fw-semibold">성명:</span>
+    <span th:text="${studentName}">홍길동</span>
+
+    <style>
+        body { padding-bottom: 56px; }
+        .assignment-footer {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1030;
+            padding: 10px 16px;
+            background: rgba(15, 52, 96, 0.96);
+            color: #ffffff;
+            font-size: 0.9rem;
+            text-align: center;
+            box-shadow: 0 -4px 14px rgba(0, 0, 0, 0.18);
+        }
+    </style>
+    <script>
+        (function () {
+            const timeElement = document.getElementById('assignment-current-time');
+            const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+            const pad = value => String(value).padStart(2, '0');
+
+            function updatePracticeTime() {
+                const now = new Date();
+                const hour = now.getHours();
+                const period = hour < 12 ? '오전' : '오후';
+                const displayHour = hour % 12 || 12;
+                timeElement.textContent =
+                    `${now.getFullYear()}년 ${now.getMonth() + 1}월 ${now.getDate()}일 ` +
+                    `(${weekdays[now.getDay()]}) ${period} ${pad(displayHour)}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+            }
+
+            updatePracticeTime();
+            setInterval(updatePracticeTime, 1000);
+        })();
+    </script>
+</footer>
+</body>
+</html>
