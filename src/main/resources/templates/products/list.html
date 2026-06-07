@@ -48,18 +48,33 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div class="page-header">
             <h4 class="fw-bold mb-0">상품 목록</h4>
-            <small class="text-muted">총 <span th:text="${#lists.size(products)}"></span>개 상품</small>
+            <small class="text-muted">
+                총 <span th:text="${productPage.totalElements}">0</span>개 상품
+            </small>
         </div>
         <a th:href="@{/products/add}" class="btn btn-danger btn-sm px-4 fw-semibold"
            sec:authorize="hasRole('ADMIN')">+ 상품 등록</a>
     </div>
 
+    <form th:action="@{/products}" method="get" class="row g-2 mb-3">
+        <div class="col-md-10">
+            <input type="text" name="keyword" class="form-control"
+                   placeholder="상품명 또는 설명 검색"
+                   th:value="${keyword}">
+        </div>
+        <div class="col-md-2 d-flex gap-2">
+            <button type="submit" class="btn btn-primary w-100">검색</button>
+            <a th:href="@{/products}" class="btn btn-outline-secondary w-100">초기화</a>
+        </div>
+    </form>
+
     <div class="card border-0 shadow-sm">
         <div class="card-body p-0">
-            <div th:if="${#lists.isEmpty(products)}" class="text-center py-5 text-muted">
+            <div th:if="${productPage.empty}" class="text-center py-5 text-muted">
                 <p class="mb-0">등록된 상품이 없습니다.</p>
             </div>
-            <div th:unless="${#lists.isEmpty(products)}" class="table-responsive">
+
+            <div th:unless="${productPage.empty}" class="table-responsive">
                 <table class="table table-hover mb-0 align-middle">
                     <thead>
                         <tr>
@@ -73,7 +88,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:each="p : ${products}">
+                        <tr th:each="p : ${productPage.content}">
                             <td class="ps-4 text-muted small" th:text="${p.id}"></td>
                             <td>
                                 <a th:href="@{/products/{id}(id=${p.id})}"
@@ -104,6 +119,28 @@
             </div>
         </div>
     </div>
+
+    <nav th:if="${productPage.totalPages > 1}" class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${productPage.first} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/products(page=${productPage.number - 1}, keyword=${keyword})}">이전</a>
+            </li>
+
+            <li class="page-item"
+                th:each="pageNum : ${#numbers.sequence(0, productPage.totalPages - 1)}"
+                th:classappend="${pageNum == productPage.number} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/products(page=${pageNum}, keyword=${keyword})}"
+                   th:text="${pageNum + 1}"></a>
+            </li>
+
+            <li class="page-item" th:classappend="${productPage.last} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/products(page=${productPage.number + 1}, keyword=${keyword})}">다음</a>
+            </li>
+        </ul>
+    </nav>
 </div>
 
 <div th:replace="~{fragments/footer :: assignmentFooter}"></div>

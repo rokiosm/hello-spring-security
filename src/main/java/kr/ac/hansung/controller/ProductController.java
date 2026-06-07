@@ -5,6 +5,9 @@ import kr.ac.hansung.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -15,8 +18,15 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("products", productService.findAll());
+    public String list(@RequestParam(defaultValue = "0") int page,
+                    @RequestParam(required = false) String keyword,
+                    Model model) {
+        Pageable pageable = PageRequest.of(page, 5);
+        Page<?> productPage = productService.findProducts(keyword, pageable);
+
+        model.addAttribute("productPage", productPage);
+        model.addAttribute("keyword", keyword);
+
         return "products/list";
     }
 
